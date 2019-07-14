@@ -2,8 +2,14 @@ function connectionClosed({commit}) {
 	commit('stream/reset')
 }
 
-function connectionReady({dispatch}) {
+function connectionReady({dispatch, getters: {client}}) {
+	client.send({'request-type': 'SetHeartbeat', enable: true})
+
 	return dispatch('stream/reload')
+}
+
+function eventHeartbeat({commit}, data) {
+	commit('stream/heartbeat', data)
 }
 
 function eventStreamStatus({commit}, data) {
@@ -42,13 +48,13 @@ function eventStreamStopped({commit}) {
 	commit('stream/set/streaming', false)
 }
 
-async function setStreaming({commit, getters: {client}}, {status}) {
+async function setStreaming({getters: {client}}, {status}) {
 	const req = status ? 'StartStreaming' : 'StopStreaming'
 
 	await client.send({'request-type': req})
 }
 
-async function setRecording({commit, getters: {client}}, {status}) {
+async function setRecording({getters: {client}}, {status}) {
 	const req = status ? 'StartRecording' : 'StopRecording'
 
 	await client.send({'request-type': req})
@@ -71,6 +77,7 @@ async function streamReload({commit, getters: {client}}) {
 export default {
 	'connection/closed': connectionClosed,
 	'connection/ready': connectionReady,
+	'event/Heartbeat': eventHeartbeat,
 	'event/RecordingStarted': eventRecordingStarted,
 	'event/RecordingStarting': eventRecordingStarting,
 	'event/RecordingStopped': eventRecordingStopped,

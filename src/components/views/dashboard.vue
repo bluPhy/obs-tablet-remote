@@ -1,28 +1,35 @@
 <template>
-	<div class="dashboard">
-		<div class="dashboard-tabs" :class="{'editing-mode': editing}">
+	<div class="flex flex-col flex-1 items-stretch h-full">
+		<div
+			class="flex flex-col items-stretch flex-1 flex-grow h-full"
+			:class="{'color-editing': editing}"
+		>
 			<tab
-				class="dashboard-tab"
 				v-for="tab in tabs"
 				:key="tab.id"
 				:tab="tab"
 			/>
 		</div>
+		<!--
+		<div class="flex-none">
+			Tab Switcher
+		</div>
+		-->
 	</div>
 </template>
 
 <script>
-	import {mapState} from 'vuex'
+import {mapState} from 'vuex'
 
-	import Tab from '../tab'
+import Tab from '../tab'
 
-	export default {
-		components: {
-			Tab
-		},
-		computed: {
-			...mapState(['editing']),
-			...mapState('layout', ['tabs'])
-		}
+export default {
+	components: {
+		Tab
+	},
+	computed: {
+		...mapState(['editing']),
+		...mapState('layout', ['tabs'])
 	}
+}
 </script>

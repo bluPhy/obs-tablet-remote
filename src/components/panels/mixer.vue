@@ -1,46 +1,46 @@
 <template>
-	<panel-wrapper :content-class="['panel-mixer']">
-		<template slot="name">Mixer</template>
-		<div class="audio-devices" v-if="audioDevices">
+	<panel-wrapper :content-class="['button-grid', 'has-per-row-1', 'overflow-y-auto']">
+		<template slot="name">
+			Mixer
+		</template>
+
+		<template
+			v-if="audioSources"
+			class="audio-devices"
+		>
 			<button
-				:id="audioDevice.name.replace(/\W/g,'-')"
-				:runme="getMuteStatus(audioDevice.name)"
-				class="audio-device"
-				v-for="audioDevice in audioDevices"
-				:key="audioDevice.name"
-				@click="toggleMuteForAudioDevice(audioDevice.name)"
-				v-text="audioDevice.name"></button>
-		</div>
-		<div v-else>
+				v-for="source in audioSources"
+				:id="source.name.replace(/\W/g,'-')"
+				:key="source.name"
+				:class="[source.muted ? 'is-inactive' : 'is-active']"
+				class="button"
+				@click="toggleMute({source: source.name, mute: !source.muted})"
+				v-text="source.name"
+			/>
+		</template>
+		<template v-else>
 			Audio Device list is empty? ¯\_(ツ)_/¯
-		</div>
+		</template>
 	</panel-wrapper>
 </template>
 
 <script>
-import {mapState, mapActions} from 'vuex'
-import panelMixin from '../mixins/panel'
+import {mapActions, mapGetters} from 'vuex'
+import panelMixin from '@/mixins/panel'
 
 export default {
 
 	mixins: [panelMixin],
 
 	computed: {
-		...mapState('obs', {
-			audioDevices: state => state.mixer.list
+		...mapGetters('obs', {
+			audioSources: 'sources/audioSources'
 		})
 	},
 
 	methods: {
-		getMuteStatus(name) {
-			this.muteStatus({name})
-		},
-		async toggleMuteForAudioDevice(name) {
-			await this.toggleMute({name})
-		},
 		...mapActions('obs', {
-			toggleMute: 'mixer/toggle-mute',
-			muteStatus: 'mixer/mute-status'
+			toggleMute: 'sources/mute'
 		})
 	}
 }
